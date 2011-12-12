@@ -10,6 +10,10 @@ from Modelo import Basis
 from Modelo import Reduction
 from Modelo import Object
 from os.path import join
+
+##############
+#Factorizators
+##############
 def PCA(X,r):
   if r>X.shape[0]:
     print "[ERROR] Trying to extract more PCs than possible"
@@ -67,7 +71,9 @@ def VQ2(X,r):
   kmeans_mdl.factorize()
   return kmeans_mdl.W,kmeans_mdl.H,np.dot(kmeans_mdl.W,kmeans_mdl.H)
 
-##################################
+####################
+#quantumExtraMethods
+####################
 
 def quantumNormalize(X):
   Xn = X/np.dot(np.ones((X.shape[0],1)),np.dot(np.ones((1,X.shape[0])),X))
@@ -82,58 +88,114 @@ def quantumReconstruct(X,B):
   Xh = Xh / np.dot(np.ones((X.shape[0],1)),np.sqrt(np.dot(np.ones((1,X.shape[0])),X2)))
   return Xh
 
-###################################
+############
+#Reducers
+############
 
-def ReduceQLSA(X,r,path,F=None,D=None,P=None):
-  return Reduce(QLSA,X,r,path,F,D,P)
 
-def ReduceNMF(X,r,path,F=None,D=None,P=None):
-  return Reduce(NMF,X,r,path,F,D,P)
+class Reducer():
+  def __init__(factorizator,X,r,path,D=None,P=None,F=None):
+    self.factorizator = factorizator
+    self.X = X
+    self.R = r
+    self.path  = path
+    if F==None:
+      F = [""]*X.shape[0]
+    if D==None:
+      D = [""]*X.shape[1]
+    if P == None :
+      P = [""]*X.shape[1]
+    self.features = []
+    self.documents = []
+    for i in F:
+      self.features.append(Feature(i))
+    for i in range(len(D)):
+      self.documents.append(Object(D[i],P[i])) 
+    #Define directories for storing or loading factorization results
+    basisFile = join(path,"basis.npy")
+    repFile = join(path,"rep.npy")
+    reconstructionFile = 
+    #Verify if there is already a factorization in the path directory
 
-def ReducePCA(X,r,path,F=None,D=None,P=None):
-  return Reduce(PCA,X,r,path,F,D,P)
+    if(os.path.exists(basisFile) and os.path.exists(repFile) and os.path.exists(reconstructionFile)):
+      #Load existing factorization
+      B = np.load(basisFile)
+      R = np.load(repFile)
+      Xh = np.load(reconstructionFile) 
+    else:
+      #Factorize and store results
+      B,R,Xh = factorizator(X,r)
 
-def ReduceVQ(X,r,path,F=None,D=None,P=None):
-  return Reduce(VQ,X,r,path,F,D,P)
+      fileBasis = open(basisFile,'w')
+      np.save(fileBasis,B)
+      fileBasis.close()
 
-def Reduce(M,X,r,path,F=None,D=None,P=None):
-  if F==None:
-    F = [""]*X.shape[0]
-  if D==None:
-    D = [""]*X.shape[1]
-    P = [""]*X.shape[1]
-  features = []
-  documents = []
-  for i in F:
-    features.append(Feature(i))
-  for i in range(len(D)):
-    documents.append(Object(D[i],P[i])) 
-  red = Reduction(X,r,features,documents,M) 
-  im  = basisToImage(red.basisM.max(),red.basisM.min())
-  for i in range(r):
-    im.toImage(red.basisM[:,i],112,join(path,"b"+str(i)))
-  return red,documents,im
+      fileRep = open(repFile,'w')
+      np.save(fileRep,R)
+      fileRep.close()
 
-########################################
+      fileReconstruct = open(join(path,"reconstruct.npy"),'w')
+      np.save(fileReconstruct,Xh)
+      fileReconstruct.close()
+    #Finally build reduction
+    self.reduction = Reduction(X,r,self.features,self.documents,B,R,Xh) 
 
-def imagesMatrix(path):
-  listing = os.listdir(path)
-  listing.sort()
-  count = 0
-  docFiles = []
-  for infile in listing:
-    count = count + 1
-    docFiles.append(infile)
-  matrix = np.zeros((10304,count))
-  for i in range(len(listing)):
-    matrix[:,i]=np.asarray(read_pgm(join(path,listing[i]))).reshape(-1)
-  return matrix
+######################
+#HTML Views Generators
+######################
 
-class basisToImage():
+class HTMLBasisView():
+  def __init__(self,reducer,path,basisViewGenerator=None):
+    self.reducer = reducer
+    self.path = path
+    if basisViewGenerator == None:
+      basisDirectory = join(path,"basisImages")
+      try:
+        os.mkdir(basisDirectory)
+        self.basisView =  basisToImage(self.reduction.basisM.max(),self.reduction.basisM.min(),112,basisDirectory)
+    else:
+      self.basisView= basisViewGenerator
 
-  def __init__(self,maxp,maxn):
+
+  def generate(self):
+    html = join(self.path,"basis.html")
+    f = open(html,'w')
+    f.write("<html>")
+    j = 0
+    for i in self.reducer.reduction.basis:
+      f.write(self.basisView.toHTML(i.feature,"b"+str(j))
+    f.write("</html>")
+    f.close()
+    return html
+
+
+class HTMLObjectsView():
+
+  def setOriginalObjectViewGenerator(self,generator):
+    self.originalView = generator
+  def RepresentationViewGenerator(self,generator):
+    self.representationView = generator
+  def ReconstructedViewGenerator(self,generator):
+    self.reconstructedView = generator 
+    self.originalView = None
+    self.representationView = None
+    self.reconstructedView = None
+
+###########################
+#Objects views generators
+###########################
+
+class imageOriginalViewGenerator():
+  def toHTML(self,obj):
+    return "<img src='"+obj.path+"'></img>"
+
+class imageViewGenerator():
+
+  def __init__(self,maxp,maxn,path,h):
     self.maxp = maxp
     self.maxn = maxn
+    self.path = path
+    self.h = self.h
 
   def getColor(self,number):
     """Returns an array with three elments R, G and B with a certain level of black or red (depending on the sign of the numbre provided)"""
@@ -151,13 +213,38 @@ class basisToImage():
         im[i,j]=self.getColor(matrix[i,j])
     return im
 
-  def toImage(self,b,h,path):
+  def toImage(self,b,name):
     """Stores in path an image with normalized colors from red to black according to the values in b with dimesions h x lenght_of_b/h"""
     im = self.toArray(b,h)
     x = Image.fromarray(im)
-    x.save(path,"JPEG")
+    savePath = join(self.path,name+".jpeg")
+    x.save(savePath,"JPEG")
+    return savePath
+  def toHTML(self,featuresList,name):
+    b = []
+    for i in featuresList:
+      b.append(i[0])
+    return "<img src='"+toImage(b,self.h,name)+"'></img>"
 
-  
+    
+
+#########################################
+# Methods for getting matrix of images
+########################################
+
+def imagesMatrix(path):
+  """Returns a matrix formed with the pgm images in path along with a list with the names of the image fiels in order of apparence in the matrix"""
+  listing = os.listdir(path)
+  listing.sort()
+  count = 0
+  docFiles = []
+  for infile in listing:
+    count = count + 1
+    docFiles.append(infile)
+  matrix = np.zeros((10304,count))
+  for i in range(len(listing)):
+    matrix[:,i]=np.asarray(read_pgm(join(path,listing[i]))).reshape(-1)
+  return matrix,listing
 
 def read_pgm(filename, byteorder='>'):
     """Return image data from a raw PGM file as numpy array.

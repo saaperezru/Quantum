@@ -1,13 +1,13 @@
 class Basis:
 
   def __init__(self):
-    self.feature = []
+    self.features = []
 
   def addFeature(self,weight,feature):
-    self.feature.append((weight,feature))
+    self.features.append((weight,feature))
 
   def orderFeatures(self,method):
-    self.feature = method(self.feature)
+    self.features = method(self.features)
 
 
 class Object:
@@ -36,14 +36,14 @@ class Reduction:
   def _simpleOrder(l):
     return l
 
-  def __init__(self,X,r,features,documents,basisProcessor):
+  def __init__(self,X,r,features,documents,B,R,Xh):
     self.orderFeauteresInBasis = self._simpleOrder 
     self.orderBasisInObject = self._simpleOrder 
     self.dimension = r
     self.data = X
     self.basis = []
     self.objects= []
-    B,R,self.reconstructed = basisProcessor(X,r)
+    self.reconstructed = Xh
     self.basisM = B
     self.objectsM = R
     for j in range(r):
