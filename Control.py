@@ -94,7 +94,7 @@ def quantumReconstruct(X,B):
 
 
 class Reducer():
-  def __init__(factorizator,X,r,path,D=None,P=None,F=None):
+  def __init__(self,factorizator,X,r,path,D=None,P=None,F=None):
     self.factorizator = factorizator
     self.X = X
     self.R = r
@@ -114,16 +114,18 @@ class Reducer():
     #Define directories for storing or loading factorization results
     basisFile = join(path,"basis.npy")
     repFile = join(path,"rep.npy")
-    reconstructionFile = 
+    reconstructionFile = join(path,"reconstruction.npy")
     #Verify if there is already a factorization in the path directory
 
     if(os.path.exists(basisFile) and os.path.exists(repFile) and os.path.exists(reconstructionFile)):
-      #Load existing factorization
+      #Load existing factorizationh
+      print "[DEBUG] Loading existing factorization files"
       B = np.load(basisFile)
       R = np.load(repFile)
       Xh = np.load(reconstructionFile) 
     else:
       #Factorize and store results
+      print "[DEBUG] Performing Factorization"
       B,R,Xh = factorizator(X,r)
 
       fileBasis = open(basisFile,'w')
@@ -134,7 +136,7 @@ class Reducer():
       np.save(fileRep,R)
       fileRep.close()
 
-      fileReconstruct = open(join(path,"reconstruct.npy"),'w')
+      fileReconstruct = open(reconstructionFile,'w')
       np.save(fileReconstruct,Xh)
       fileReconstruct.close()
     #Finally build reduction
@@ -152,7 +154,9 @@ class HTMLBasisView():
       basisDirectory = join(path,"basisImages")
       try:
         os.mkdir(basisDirectory)
-        self.basisView =  basisToImage(self.reduction.basisM.max(),self.reduction.basisM.min(),112,basisDirectory)
+      except:
+        print "Error Creating folder"
+      self.basisView =  basisToImage(self.reduction.basisM.max(),self.reduction.basisM.min(),112,basisDirectory)
     else:
       self.basisView= basisViewGenerator
 
@@ -163,7 +167,7 @@ class HTMLBasisView():
     f.write("<html>")
     j = 0
     for i in self.reducer.reduction.basis:
-      f.write(self.basisView.toHTML(i.feature,"b"+str(j))
+      f.write(self.basisView.toHTML(i.feature,"b"+str(j)))
     f.write("</html>")
     f.close()
     return html

@@ -33,11 +33,11 @@ class Feature:
 
 class Reduction:
   
-  def _simpleOrder(l):
+  def _simpleOrder(self,l):
     return l
 
   def __init__(self,X,r,features,documents,B,R,Xh):
-    self.orderFeauteresInBasis = self._simpleOrder 
+    self.orderFeaturesInBasis= self._simpleOrder 
     self.orderBasisInObject = self._simpleOrder 
     self.dimension = r
     self.data = X
@@ -50,13 +50,13 @@ class Reduction:
       tmp = Basis()
       for i in range(B.shape[0]):
         tmp.addFeature(B[i,j],features[i])
+        tmp.orderFeatures(self.orderFeaturesInBasis)
       self.basis.append(tmp)
-    self.basis.orderFeatures(self.orderFeaturesInBasis)
     for j in range(R.shape[1]):
       for i in range(R.shape[0]):
         documents[j].addRepresentation(R[i,j],self.basis[i])
       for i in range(self.reconstructed.shape[0]):
-        documents[j].addReconstructionFeauter(self.reconstructed[i,j],features[i])
+        documents[j].addReconstructionFeature(self.reconstructed[i,j],features[i])
       documents[j].orderBasis(self.orderBasisInObject)
   def getBasis(self):
     return orderBasisInObject
