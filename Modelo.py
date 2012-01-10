@@ -16,6 +16,7 @@ class Object:
     self.path = path
     self.rep = []
     self.reconstruction = []
+    self.data = None
   def addRepresentation(self,weight,basis):
     """Adds a pair weight, basis to the representation of the object"""
     self.rep.append((weight,basis))
@@ -25,6 +26,8 @@ class Object:
   def orderBasis(self,method):
     """Order the elements of the basis of the new space according to their weights using mehtod"""
     self.rep = method(self.rep)
+  def setData(self,data):
+    self.data=data
 
 class Feature:
   
@@ -42,22 +45,21 @@ class Reduction:
     self.dimension = r
     self.data = X
     self.basis = []
-    self.objects= []
+    self.objects= documents
     self.reconstructed = Xh
     self.basisM = B
     self.objectsM = R
-    for j in range(r):
+    for j in range(self.basisM.shape[1]):
       tmp = Basis()
-      for i in range(B.shape[0]):
-        tmp.addFeature(B[i,j],features[i])
-        tmp.orderFeatures(self.orderFeaturesInBasis)
+      for i in range(self.basisM.shape[0]):
+        tmp.addFeature(self.basisM[i,j],features[i])
       self.basis.append(tmp)
-    for j in range(R.shape[1]):
-      for i in range(R.shape[0]):
-        documents[j].addRepresentation(R[i,j],self.basis[i])
+    for j in range(self.objectsM.shape[1]):
+      for i in range(self.objectsM.shape[0]):
+        documents[j].addRepresentation(self.objectsM[i,j],self.basis[i])
       for i in range(self.reconstructed.shape[0]):
         documents[j].addReconstructionFeature(self.reconstructed[i,j],features[i])
-      documents[j].orderBasis(self.orderBasisInObject)
+      documents[j].setData(X[:,j])
   def getBasis(self):
     return orderBasisInObject
   def addBasis(self,basis):
