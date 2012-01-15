@@ -48,9 +48,9 @@ F = generator.words
 print "[DEBUG]"
 print M.shape
 
-generateFactorization("QLSA",Control.QLSA,M,Docs,DocsP,F)
+#generateFactorization("QLSA",Control.QLSA,M,Docs,DocsP,F)
 generateFactorization("QLSA2",Control.QLSA2,M,Docs,DocsP,F)
-generateFactorization("NMF",Control.NMF,M,Docs,DocsP,F)
-generateFactorization("VQ",Control.VQ,M,Docs,DocsP,F)
-generateFactorization("PCA",Control.PCA,M,Docs,DocsP,F)
+#generateFactorization("NMF",Control.NMF,M,Docs,DocsP,F)
+#generateFactorization("VQ",Control.VQ,M,Docs,DocsP,F)
+#generateFactorization("PCA",Control.PCA,M,Docs,DocsP,F)
 

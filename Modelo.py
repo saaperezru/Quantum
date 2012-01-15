@@ -49,15 +49,15 @@ class Reduction:
     self.reconstructed = Xh
     self.basisM = B
     self.objectsM = R
-    for j in range(self.basisM.shape[1]):
+    for j in range(self.dimension):
       tmp = Basis()
-      for i in range(self.basisM.shape[0]):
+      for i in range(self.data.shape[0]):
         tmp.addFeature(self.basisM[i,j],features[i])
       self.basis.append(tmp)
-    for j in range(self.objectsM.shape[1]):
-      for i in range(self.objectsM.shape[0]):
+    for j in range(self.data.shape[1]):
+      for i in range(self.dimension):
         documents[j].addRepresentation(self.objectsM[i,j],self.basis[i])
-      for i in range(self.reconstructed.shape[0]):
+      for i in range(self.data.shape[0]):
         documents[j].addReconstructionFeature(self.reconstructed[i,j],features[i])
       documents[j].setData(X[:,j])
   def getBasis(self):

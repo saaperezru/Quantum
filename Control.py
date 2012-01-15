@@ -5,6 +5,7 @@ import re
 import os
 import Image
 import colorsys as cs
+import PIL
 from Modelo import Feature
 from Modelo import Basis
 from Modelo import Reduction
@@ -21,8 +22,11 @@ def LSA(X,r):
   Uh = U[:,0:r]
   Sh = np.diag(np.array(S[0:r]))
   Vh = V[0:r,:]
+#Letting (as in the paper) rep_{ij}=<psi_{j}|sigma_{i}> is saying rep = np.dot(Uh.T,X), which is the same as rep = np.dot(Sh,Vh) because Uh.T*X = Uh.T*U*S*V = Sh*Vh (Uh.T*U gives a very special matrix)
   rep = np.dot(Sh,Vh)
   basis = Uh
+#rep2 = np.dot(basis.T,X)
+#  print "[DEBUG] Rep error = ", sum(rep-rep2)
   Xh = np.dot(basis,rep)
   return basis,rep,Xh
 def PCA(X,r):
@@ -50,7 +54,10 @@ def QLSA2(X,r):
   Xn = quantumNormalize(X)
   B,R,Xh = LSA(Xn,r)
   del Xn
-  Xh = quantumReconstruct(X,B) 
+#We reconstruct X by projecting over the basis and normalizing (we normalize because we want to take advantage of the probability interpretation that pure states in the quantum document space has)
+  Xh = quantumReconstruct(X,B)
+  R = quantumRepresent(Xh,B)
+#We square the basis to give it a probabilistic interpretation (as its a vector in the quantum documents space)
   B = np.multiply(B,B)
   return B,R,Xh
 def NMF(X,r):
@@ -100,13 +107,21 @@ def quantumNormalize(X):
   return Xn
 
 def quantumReconstruct(X,B):
+  #The projector over the space defined by the base B is Ps = BB^T
   Xh = np.dot(B.T,X)
   Xh = np.dot(B,Xh)
+  #Now we need to normalize
   X2 = np.multiply(X,X)
   Xh = Xh / np.dot(np.ones((X.shape[0],1)),np.sqrt(np.dot(np.ones((1,X.shape[0])),X2)))
   del X2
-  return Xh
-
+  #We return the squared version so it has a probabilistic interpretation
+  return np.multiply(Xh,Xh)
+def quantumRepresent(X,B):
+  #We want rep_{ij} to be <psi^hat_{i}|sigma_{k}>^2, which is equals to P(Z_{k}|d_{i}) : probability of latent topic Z_{k} given document i
+# And we know that <psi^hat_{i}|sigma_{k}> = <sigma_{k}|psi^hat_{i}> because both vectors have real values and so rep = (Uh.T*X)^2
+  R = np.dot(B.T,X)
+  R = np.multiply(R,R)
+  return R
 ############
 #Reducers
 ############
@@ -264,8 +279,8 @@ class textViewGenerator():
 ###########################
 class imageOriginalViewGenerator():
   """ A class for generating an HTML String for viewing the originaal version of a pgm image, i.e. transforming a PGM image into a JPG image and storing it in an accesible site for an HTML page"""
-  def __init__(self,maxp,path,htmlPath,h,inverse=False):
-   self.generator = imageViewGenerator(maxp,-1,path,htmlPath,h,inverse) 
+  def __init__(self,maxp,path,htmlPath,h,inverse=False,QLSA=False):
+   self.generator = imageViewGenerator(maxp,-1,path,htmlPath,h,inverse,QLSA) 
  
   def toHTML(self,obj):
     #objArray = np.asarray(read_pgm(obj.path).reshape(-1))
@@ -273,13 +288,14 @@ class imageOriginalViewGenerator():
 
 class imageViewGenerator():
 
-  def __init__(self,maxp,maxn,path,htmlPath,h,inverse=False):
-    #self.maxp = maxp
+  def __init__(self,maxp,maxn,path,htmlPath,h,inverse=False,QLSA=False):
+    self.maxp = float(maxp)
     self.maxn = maxn
     self.path = path
     self.h = h
     self.htmlPath = htmlPath
     self.inverse = inverse
+    self.QLSA = QLSA
 
   def getColor(self,number):
     """Returns an array with three elments R, G and B with a certain level of black or red (depending on the sign of the numbre provided)"""
@@ -297,6 +313,7 @@ class imageViewGenerator():
 
   def toArray(self,b,h):
     #print "[DEBUG] Siize:" + str(b.size) + " - "  +str(h)
+    #print "[DEBUG] imageViewGenerator : b.size = ",b.size," H = ",h," W = " , b.size/h
     matrix = (b.reshape(h,-1))
     im = np.zeros((matrix.shape[0],matrix.shape[1],3),dtype=np.uint8)
     for i in range(im.shape[0]):
@@ -319,6 +336,8 @@ class imageViewGenerator():
     b = []
     for i in featuresList:
       b.append(i[0])
+    if QLSA: 
+      self.maxp = max(b)
     return "<img src='"+relpath(self.toImage(np.array(b),name),self.htmlPath)+"'></img>"
 
 class imageScaledViewGenerator(imageViewGenerator):
@@ -326,7 +345,14 @@ class imageScaledViewGenerator(imageViewGenerator):
     imageViewGenerator.__init__(self,maxp,maxn,path,htmlPath,h)
     self.cellSize = cellSize
   def toArray(self,b,h):
-    matrix = (b.reshape(h,-1))
+    if (b.size%h)!=0:
+      w = np.ceil(b.size/h)
+      area = w*h
+      b = np.append(b, [0]*(area-b.size))
+      matrix = (b.reshape(h,w))
+    else:
+      matrix = (b.reshape(h,-1))
+    #print "[DEBUG] imageScaledViewGenerator : b.size = ",b.size," H = ",h," W = " , b.size/h
     #Now we scale the image array by multiplying it in the left by X and in the right by Y.
     r = matrix.shape[0]
     c = matrix.shape[1]
@@ -348,7 +374,7 @@ class imageScaledViewGenerator(imageViewGenerator):
 # Methods for getting matrix of images
 ########################################
 
-def imagesMatrix(path):
+def imagesMatrix(path,imageSize = 10304,byteorder = '>'):
   """Returns a matrix formed with the pgm images in path along with a list with the names of the image fiels in order of apparence in the matrix"""
   listing = os.listdir(path)
   listing.sort()
@@ -357,9 +383,9 @@ def imagesMatrix(path):
   for infile in listing:
     count = count + 1
     docFiles.append(infile)
-  matrix = np.zeros((10304,count))
+  matrix = np.zeros((imageSize,count))
   for i in range(len(listing)):
-    matrix[:,i]=np.asarray(read_pgm(join(path,listing[i]))).reshape(-1)
+    matrix[:,i]=np.asarray(read_pgm(join(path,listing[i]),byteorder)).reshape(-1)
   return matrix,listing
 
 def read_pgm(filename, byteorder='>'):
@@ -380,6 +406,31 @@ def read_pgm(filename, byteorder='>'):
     except AttributeError:
         raise ValueError("Not a raw PGM file: '%s'" % filename)
     return np.frombuffer(buffer,dtype='u1' if int(maxval) < 256 else byteorder+'u2',count=int(width)*int(height),offset=len(header)).reshape((int(height), int(width)))
+
+def JPGtoArray(path):
+  image = PIL.Image.open(path)
+  im = np.asarray(image)
+  ret = np.empty((1,im.shape[0]*im.shape[1]))
+  k = 0
+  for i in range(im.shape[0]):
+    for j in range(im.shape[1]):
+      ret[0,k] = cs.rgb_to_hsv(im[i,j,0],im[i,j,1],im[i,j,2])[2]
+      k = k+1
+  return ret
+
+def JPGtoMatrix(path,w,h):
+  """Returns a matrix formed with the pgm images in path along with a list with the names of the image fiels in order of apparence in the matrix"""
+  listing = os.listdir(path)
+  listing.sort()
+  count = 0
+  docFiles = []
+  for infile in listing:
+    count = count + 1
+    docFiles.append(infile)
+  matrix = np.zeros((w*h,count))
+  for i in range(len(listing)):
+    matrix[:,i]=JPGtoArray(join(path,listing[i]))
+  return matrix,listing
 
 #################################
 # Methods for getting text matrix
