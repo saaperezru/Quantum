@@ -25,7 +25,7 @@ def LSA(X,r):
 #Letting (as in the paper) rep_{ij}=<psi_{j}|sigma_{i}> is saying rep = np.dot(Uh.T,X), which is the same as rep = np.dot(Sh,Vh) because Uh.T*X = Uh.T*U*S*V = Sh*Vh (Uh.T*U gives a very special matrix)
   rep = np.dot(Sh,Vh)
   basis = Uh
-#rep2 = np.dot(basis.T,X)
+  #rep2 = np.dot(basis.T,X)
 #  print "[DEBUG] Rep error = ", sum(rep-rep2)
   Xh = np.dot(basis,rep)
   return basis,rep,Xh
@@ -111,7 +111,7 @@ def quantumReconstruct(X,B):
   Xh = np.dot(B.T,X)
   Xh = np.dot(B,Xh)
   #Now we need to normalize
-  X2 = np.multiply(X,X)
+  X2 = np.multiply(Xh,Xh)
   Xh = Xh / np.dot(np.ones((X.shape[0],1)),np.sqrt(np.dot(np.ones((1,X.shape[0])),X2)))
   del X2
   #We return the squared version so it has a probabilistic interpretation
