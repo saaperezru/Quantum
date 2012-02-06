@@ -1,0 +1,11 @@
+%
+
+folderroot='/storageHP/aacruzr/datasets/oasis_latent_semantic';
+
+addpath(fullfile(folderroot,'/NIFTI/'));
+
+filepath='/storageHP/adruedao/oasis/oasis_cross-sectional/OAS1_0223_MR1_mpr_n3_anon_111_t88_masked_gfc.img';
+D=load_nii(filepath);
+
+%nii = make_nii(F3D);
+view_nii(D);
