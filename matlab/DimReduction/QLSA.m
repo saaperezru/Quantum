@@ -1,12 +1,12 @@
 function [basis,rep,Xh] = QLSA(X,r,path)
-    % Reduces the space of X to r dimensions and returns the basis for this space, the representation of each point of X 
-    % Attributes:
+    % Reduces the space of X to r dimensions and returns the basis for this space, the representation of each point of X.
+    % Parameters :
     %    X -- An feature x objects array
     %    r -- The desired dimensionality for the new space
     %    path -- A path for the algorithm to store its checkpoints
-    BPath = fullfile(path,'B.mat')
-    RPath = fullfile(path,'R.mat')
-    XhPath = fullfile(path,'Xh.mat')
+    BPath = fullfile(path,'B.mat');
+    RPath = fullfile(path,'R.mat');
+    XhPath = fullfile(path,'Xh.mat');
     if exist(BPath,'file') && exist(RPath,'file') && exist(XhPath,'file')
         tmp = load(BPath);
         basis = tmp.basis;
@@ -18,7 +18,7 @@ function [basis,rep,Xh] = QLSA(X,r,path)
         % We begin by normalizing the original matrix X
        % We begin by normalizing the original matrix X
         Xsize = size(X);
-        Xn = X./(ones(Xsize(0),1)*(ones(1,Xsize(0))*X));
+        Xn = X./(ones(Xsize(1),1)*(ones(1,Xsize(1))*X));
         Xn = sqrt(Xn);
         %We need the SVD decomposition of the normalized matrix
         [B,R,Xh] = LSA(X,r,path);
@@ -37,7 +37,7 @@ function [basis,rep,Xh] = QLSA(X,r,path)
         basis = B.*B;
         save(BPath,'basis');
         save(RPath,'rep');
-        save(XhPat,'Xh');
+        save(XhPath,'Xh');
     end
 
 end
