@@ -1,12 +1,12 @@
 function [X dim] = loadMatrix(path,pattern)
-    addpath('/home/saaperezru/QLSA/datasets/oasis/NIFTI/');
+    addpath('/home/saaperezru/QLSA/scripts/datasets/oasis/NIFTI/');
 
     fnames = dir(fullfile(path, pattern));
     num_files = size(fnames,1);
     
 
     [x y z] = cut(path,pattern);
-    r = 4.0;
+    r = 1.0;
     % Size of the 3d image after cut and after downscaling
     xDim = ceil(((x(2)-x(1)+1)-(r/2))/r);
     yDim = ceil(((y(2)-y(1)+1)-(r/2))/r);

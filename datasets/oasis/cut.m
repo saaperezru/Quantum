@@ -1,6 +1,6 @@
 function [x,y,z] = cut(path,pattern)
     % Finds the limits for x,y and z axis that contain in the smallest uniform possible cube all the MRI images in the path found with pattern
-    addpath('/home/saaperezru/QLSA/datasets/oasis/NIFTI/');
+    addpath('/home/saaperezru/QLSA/scripts/datasets/oasis/NIFTI/');
 
     fnames = dir(fullfile(path, pattern));
     num_files = size(fnames,1);

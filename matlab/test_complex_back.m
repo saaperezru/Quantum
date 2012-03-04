@@ -9,7 +9,7 @@ LPath = '../../experiments/complex_back_airport2/l/';
 IPath = '../../experiments/complex_back_airport2/i/';
 
 
-folderroot='/home/saaperezru/QLSA/';
+folderroot='/home/saaperezru/QLSA/scripts';
 addpath(fullfile(folderroot,dataset));
 
 [X dim] = loadMatrix(data,pattern);

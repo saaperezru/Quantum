@@ -3,11 +3,11 @@ function viewer(objects,path,prefix,dim)
     % Parameters:
     %    objects -- An feature x objects matrix
     %    path -- Directory path for storing generated images 
-    addpath('/home/saaperezru/QLSA/datasets/oasis/NIFTI/');
+    addpath('/home/saaperezru/QLSA/scripts/datasets/oasis/NIFTI/');
 
     tmp = size(objects);
-    for i=1:tmp(1)
+    for i=1:tmp(2)
        im = reshape(objects(:,i),dim(1),dim(2),dim(3));
-       save(make_nii(im),fullfile(path,strcat(prefix,num2str(i))));
+       save_nii(make_nii(im),fullfile(path,strcat(prefix,num2str(i))));
     end
 end
