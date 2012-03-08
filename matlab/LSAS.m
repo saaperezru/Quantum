@@ -11,7 +11,7 @@ function [basis,rep,Xh] = LSA(X,r,path)
         tmp = load(VPath);
         V = tmp.V;
     else
-        [U,S,V] = svds(sparse(X));
+        [U,S,V] = svds(sparse(X),r);
         save(UPath,'U','-v7.3');
         save(SPath,'S','-v7.3');
         save(VPath,'V','-v7.3');

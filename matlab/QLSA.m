@@ -27,7 +27,7 @@ function [basis,rep,Xrec,L,I] = QLSA(X,r,path)
         Xquan = X./(ones(Xsize(1),1)*(ones(1,Xsize(1))*X));
         Xquan = sqrt(Xquan);
         %We need the SVD decomposition of the normalized matrix
-        [B,Ro,Xquanr] = LSA(Xquan,r,path);
+        [B,Ro,Xquanr] = LSAS(Xquan,r,path);
         clear Ro;
         clear Xquan;
         %Lets normalize the reconstruction
