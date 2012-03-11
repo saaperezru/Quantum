@@ -1,12 +1,12 @@
 dataset =  '/datasets/oasis/'
 
-data = '../../../datasets/oasis_group1/0/';
+data = '../../../datasets/oasis_group1/1/';
 pattern = '*.img';
 
-dataPath = '../../experiments/oasis_group1/0/';
-basisPath = '../../experiments/oasis_group1/0/basis/';
-LPath = '../../experiments/oasis_group1/0/l/';
-IPath = '../../experiments/oasis_group1/0/i/';
+dataPath = '../../experiments/oasis_group1/1/';
+basisPath = '../../experiments/oasis_group1/1/basis/';
+LPath = '../../experiments/oasis_group1/1/l/';
+IPath = '../../experiments/oasis_group1/1/i/';
 
 
 folderroot='/home/saaperezru/QLSA/scripts';
