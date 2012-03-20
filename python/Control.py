@@ -1,6 +1,6 @@
 import numpy as np
 import nmf
-import scipy.cluster.vq as vq
+#import scipy.cluster.vq as vq
 import re
 import os
 import Image
@@ -33,12 +33,13 @@ def PCA(X,r):
   #m = (1.0/Xo.shape[1])*np.dot(Xo,np.ones((Xo.shape[1],1)))
   m = np.asmatrix(np.mean(X,axis=1))
   print "[DEBUG] m shape : ", m.shape
-  X = X - m.T 
-  Y = (1.0/np.sqrt(X.shape[1]))*X.T
+  Xnormal = X - m.T 
+  Y = (1.0/np.sqrt(X.shape[1]))*Xnormal.T
   U,S,V = np.linalg.svd(Y)
   del U
   del S
   del Y
+  del Xnormal
   #Reduce the dimensionality of the  principal components space
   V = V[0:r,:]
   #In PCA we look for a matrix P such that Y = PX and Y has a covariance matrix with zeros in the off-diagonal terms and big numbers on the diagonal terms.
@@ -59,6 +60,7 @@ def QLSA2(X,r):
   R = quantumRepresent(Xh,B)
 #We square the basis to give it a probabilistic interpretation (as its a vector in the quantum documents space)
   B = np.multiply(B,B)
+  Xh = np.multiply(Xh,Xh)
   return B,R,Xh
 def NMF(X,r):
   """Receives a numpy matrix X and returns the basis, the representation and the reconstructed matrix from performing NMF
@@ -115,7 +117,7 @@ def quantumReconstruct(X,B):
   Xh = Xh / np.dot(np.ones((X.shape[0],1)),np.sqrt(np.dot(np.ones((1,X.shape[0])),X2)))
   del X2
   #We return the squared version so it has a probabilistic interpretation
-  return np.multiply(Xh,Xh)
+  return Xh
 def quantumRepresent(X,B):
   #We want rep_{ij} to be <psi^hat_{i}|sigma_{k}>^2, which is equals to P(Z_{k}|d_{i}) : probability of latent topic Z_{k} given document i
 # And we know that <psi^hat_{i}|sigma_{k}> = <sigma_{k}|psi^hat_{i}> because both vectors have real values and so rep = (Uh.T*X)^2
@@ -164,17 +166,11 @@ class Reducer():
       print "[DEBUG] Performing Factorization"
       B,R,Xh = factorizator(X,r)
 
-      fileBasis = open(basisFile,'w')
-      np.save(fileBasis,B)
-      fileBasis.close()
+      np.save(basisFile,B)
 
-      fileRep = open(repFile,'w')
-      np.save(fileRep,R)
-      fileRep.close()
+      np.save(repFile,R)
 
-      fileReconstruct = open(reconstructionFile,'w')
-      np.save(fileReconstruct,Xh)
-      fileReconstruct.close()
+      np.save(reconstructionFile,Xh)
     #Finally build reduction
     print "[DEBUG] Basis :", B.shape," Documents: ",R.shape
     self.reduction = Reduction(X,r,self.features,self.documents,B,R,Xh) 

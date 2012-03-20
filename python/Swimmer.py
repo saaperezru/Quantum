@@ -56,33 +56,33 @@ def generateFactorization(name,method,M,p,r,QLSA=False):
   del html
 
 
-I = "/home/jecamargom/tmp/datasets/swimmer/Y.mat"
+I = "/home/saaperezru/datasets/swimmer/Y.mat"
 tmp = sio.loadmat(I)['Y']
 print "[DEBUG] Y shape: ", tmp.shape
 M = buildMatrix(tmp,256)
-for i in range(M.shape[0]):
-  print M[i,0],
+#for i in range(M.shape[0]):
+  #print M[i,0],
 
-p = "/home/jecamargom/tmp/experiments/swimmer3"
+p = "../../experimentsPython/swimmer8"
 r = 8
 #generateFactorization("QLSA",Control.QLSA,M,p,r)
 generateFactorization("QLSA2",Control.QLSA2,M,p,r,True)
-#generateFactorization("NMF",Control.NMF,M,p,r)
+generateFactorization("NMF",Control.NMF,M,p,r)
 #generateFactorization("VQ",Control.VQ,M,p,r)
-#generateFactorization("PCA",Control.PCA,M,p,r)
+generateFactorization("PCA",Control.PCA,M,p,r)
 
-p = "/home/jecamargom/tmp/experiments/swimmer1"
+p = "../../experimentsPython/swimmer16"
 r = 16
 #generateFactorization("QLSA",Control.QLSA,M,p,r)
 generateFactorization("QLSA2",Control.QLSA2,M,p,r,True)
-#generateFactorization("NMF",Control.NMF,M,p,r)
+generateFactorization("NMF",Control.NMF,M,p,r)
 #generateFactorization("VQ",Control.VQ,M,p,r)
-#generateFactorization("PCA",Control.PCA,M,p,r)
+generateFactorization("PCA",Control.PCA,M,p,r)
 
-p = "/home/jecamargom/tmp/experiments/swimmer2"
+p = "../../experimentsPython/swimmer32"
 r = 32
 #generateFactorization("QLSA",Control.QLSA,M,p,r)
 generateFactorization("QLSA2",Control.QLSA2,M,p,r,True)
-#generateFactorization("NMF",Control.NMF,M,p,r)
+generateFactorization("NMF",Control.NMF,M,p,r)
 #generateFactorization("VQ",Control.VQ,M,p,r)
-#generateFactorization("PCA",Control.PCA,M,p,r)
+generateFactorization("PCA",Control.PCA,M,p,r)
