@@ -10,7 +10,7 @@ function [x,y,z] = cut(path,pattern)
     z = [ Inf 1 ];
 
     for f = 1:num_files
-        disp(fnames(f).name)
+        disp(fnames(f).name);
         filepath=fullfile(path,fnames(f).name);
         F = load_nii(filepath);
         D = F.img;

@@ -49,10 +49,10 @@ function [basis,rep,Xrec,L,I] = QLSA(X,r,path)
         % as PTZ = basis and PTD = Xh, then I = Xh-basis*PZD
         L = basis * rep;
         I = Xrec - L;
-        save(BPath,'basis');
-        save(RPath,'rep');
-        save(XhPath,'Xrec');
-        save(LPath,'L');
-        save(IPath,'I');
+        save(BPath,'basis','-v7.3');
+        save(RPath,'rep','-v7.3');
+        save(XhPath,'Xrec','-v7.3');
+        save(LPath,'L','-v7.3');
+        save(IPath,'I','-v7.3');
     end
 end
