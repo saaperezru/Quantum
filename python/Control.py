@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import numpy as np
 import nmf
 #import scipy.cluster.vq as vq
@@ -30,23 +31,22 @@ def LSA(X,r):
   Xh = np.dot(basis,rep)
   return basis,rep,Xh
 def PCA(X,r):
+  print "[DEBUG] Executing PCA"
   #m = (1.0/Xo.shape[1])*np.dot(Xo,np.ones((Xo.shape[1],1)))
   m = np.asmatrix(np.mean(X,axis=1))
   print "[DEBUG] m shape : ", m.shape
   Xnormal = X - m.T 
-  Y = (1.0/np.sqrt(X.shape[1]))*Xnormal.T
-  U,S,V = np.linalg.svd(Y)
-  del U
-  del S
-  del Y
-  del Xnormal
+  #Y = (1.0/np.sqrt(X.shape[1]))*Xnormal
+  U,S,V = np.linalg.svd(Xnormal)
   #Reduce the dimensionality of the  principal components space
-  V = V[0:r,:]
+  U = U[:,0:r]
   #In PCA we look for a matrix P such that Y = PX and Y has a covariance matrix with zeros in the off-diagonal terms and big numbers on the diagonal terms.
   #This P matrix is found by performing SVD over (1/sqrt(n))*X = U S VT and taking P = V. Here P is a transformation matrix from the canonical base space to the feature base space.
   # In this script we are interested on a matrix W such that X ~= WH, where W is a transformation matrix from the the feature basis space to the canonical basis space and H is the representation of the data in the feature space. So by linear algebra we know that W = P^-1, and so W = V^-1 = V^T. And H is obviously VX (come on V^T V X = X !!!!)
-  rep = np.dot(V,X)
-  return V.T,rep,np.dot(V.T,rep)
+  rep = np.dot(U.T,Xnormal)
+  rec = np.dot(U,rep) + m.T 
+  #np.save('/home/saaperezru/QLSA/X.npy',X)
+  return U,rep,rec
 
 def QLSA(X,r):
   Xh = quantumNormalize(X)
@@ -165,6 +165,7 @@ class Reducer():
       #Factorize and store results
       print "[DEBUG] Performing Factorization"
       B,R,Xh = factorizator(X,r)
+      print Xh-X
 
       np.save(basisFile,B)
 

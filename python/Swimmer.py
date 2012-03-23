@@ -10,8 +10,7 @@ def createBasisViewer(basisDirectory,htmlPath,Reducer,QLSA):
   except:
     print "Error Creating folder"
   return  Control.imageViewGenerator(Reducer.reduction.basisM.max(),Reducer.reduction.basisM.min(),basisDirectory,htmlPath,32,True,QLSA)
-
-def createReconstructionViewer(imagesDirectory,htmlPath,Reducer,QLSA):
+def createReconstructionViewer(imagesDirectory,htmlPath,Reducer,QLSA): 
   try:
     os.mkdir(imagesDirectory)
   except:
@@ -78,7 +77,7 @@ generateFactorization("QLSA2",Control.QLSA2,M,p,r,True)
 generateFactorization("NMF",Control.NMF,M,p,r)
 #generateFactorization("VQ",Control.VQ,M,p,r)
 generateFactorization("PCA",Control.PCA,M,p,r)
-
+#
 p = "../../experimentsPython/swimmer32"
 r = 32
 #generateFactorization("QLSA",Control.QLSA,M,p,r)
@@ -86,3 +85,9 @@ generateFactorization("QLSA2",Control.QLSA2,M,p,r,True)
 generateFactorization("NMF",Control.NMF,M,p,r)
 #generateFactorization("VQ",Control.VQ,M,p,r)
 generateFactorization("PCA",Control.PCA,M,p,r)
+#
+p = "../../experimentsPython/swimmer100"
+r = 100
+generateFactorization("PCA",Control.PCA,M,p,r)
+generateFactorization("QLSA2",Control.QLSA2,M,p,r)
+generateFactorization("NMF",Control.NMF,M,p,r)
