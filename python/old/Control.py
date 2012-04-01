@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 import nmf
-#import scipy.cluster.vq as vq
+import scipy.cluster.vq as vq
 import re
 import os
 import Image

@@ -59,10 +59,12 @@ I = "/home/saaperezru/datasets/swimmer/Y.mat"
 tmp = sio.loadmat(I)['Y']
 print "[DEBUG] Y shape: ", tmp.shape
 M = buildMatrix(tmp,256)
+#M = X/np.dot(np.ones((X.shape[0],1)),np.dot(np.ones((1,X.shape[0])),X))
+
 #for i in range(M.shape[0]):
   #print M[i,0],
 
-p = "../../experimentsPython/swimmer8"
+p = "../../../experimentsPython/swimmer82"
 r = 8
 #generateFactorization("QLSA",Control.QLSA,M,p,r)
 generateFactorization("QLSA2",Control.QLSA2,M,p,r,True)
@@ -72,22 +74,22 @@ generateFactorization("PCA",Control.PCA,M,p,r)
 
 p = "../../experimentsPython/swimmer16"
 r = 16
-#generateFactorization("QLSA",Control.QLSA,M,p,r)
-generateFactorization("QLSA2",Control.QLSA2,M,p,r,True)
-generateFactorization("NMF",Control.NMF,M,p,r)
-#generateFactorization("VQ",Control.VQ,M,p,r)
-generateFactorization("PCA",Control.PCA,M,p,r)
-#
-p = "../../experimentsPython/swimmer32"
-r = 32
-#generateFactorization("QLSA",Control.QLSA,M,p,r)
-generateFactorization("QLSA2",Control.QLSA2,M,p,r,True)
-generateFactorization("NMF",Control.NMF,M,p,r)
-#generateFactorization("VQ",Control.VQ,M,p,r)
-generateFactorization("PCA",Control.PCA,M,p,r)
-#
-p = "../../experimentsPython/swimmer100"
-r = 100
-generateFactorization("PCA",Control.PCA,M,p,r)
-generateFactorization("QLSA2",Control.QLSA2,M,p,r)
-generateFactorization("NMF",Control.NMF,M,p,r)
+##generateFactorization("QLSA",Control.QLSA,M,p,r)
+#generateFactorization("QLSA2",Control.QLSA2,M,p,r,True)
+#generateFactorization("NMF",Control.NMF,M,p,r)
+##generateFactorization("VQ",Control.VQ,M,p,r)
+#generateFactorization("PCA",Control.PCA,M,p,r)
+##
+#p = "../../experimentsPython/swimmer32"
+#r = 32
+##generateFactorization("QLSA",Control.QLSA,M,p,r)
+#generateFactorization("QLSA2",Control.QLSA2,M,p,r,True)
+#generateFactorization("NMF",Control.NMF,M,p,r)
+##generateFactorization("VQ",Control.VQ,M,p,r)
+#generateFactorization("PCA",Control.PCA,M,p,r)
+##
+#p = "../../experimentsPython/swimmer100"
+#r = 100
+#generateFactorization("PCA",Control.PCA,M,p,r)
+#generateFactorization("QLSA2",Control.QLSA2,M,p,r)
+#generateFactorization("NMF",Control.NMF,M,p,r)
